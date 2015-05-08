@@ -150,4 +150,17 @@ public class CommonSQL {
 		return getDatabaseInstance().createStatement().executeQuery("SELECT * FROM card_set ORDER BY id DESC");
 	}
 
+	/**
+	 * @return
+	 * @throws SQLException 
+	 */
+	public static ResultSet getSetsWithCardCount() throws SQLException {
+		String query = "SELECT cs.set_name, COUNT(ct.card_set_id) AS card_count "
+				+"FROM  card_set cs "
+				+"LEFT JOIN cards_test ct ON cs.id = ct.card_set_id "
+				+"GROUP BY cs.id "
+				+"ORDER BY cs.id DESC";
+		return getDatabaseInstance().createStatement().executeQuery(query);
+	}
+
 }
