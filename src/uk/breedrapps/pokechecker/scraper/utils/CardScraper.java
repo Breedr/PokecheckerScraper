@@ -55,7 +55,7 @@ public class CardScraper {
 		try{
 			List<PokemonCard> cards = scrapeCards(set);
 			//Add cards to DB
-			if(insert){
+			if(insert && cards.size() > 0){
 				CommonSQL.insertCards(cards);
 			}
 		}catch(Exception e){
@@ -86,11 +86,13 @@ public class CardScraper {
 			xpath = "//div[@class='entry-content']//div";
 			link_nodes = tagNode.evaluateXPath(xpath);
 
+			List<PokemonCard> cards = new ArrayList<>();
+			
 			if(tmp.size() < 1){
 				Log.e(getClass(), "No cards found");
-				return null;
+				return cards;
 			}
-			List<PokemonCard> cards = new ArrayList<>();
+			
 			PokemonCard.Builder builder = new Builder();
 			int index = 0;
 			for (int y = 0; y < link_nodes.length; y++) {
