@@ -69,7 +69,7 @@ public class AppWindow {
 	private JButton btnExport;
 	private JButton btnScans;
 	private JButton btnImport;
-	private JComboBox setComboBox;
+	private JComboBox<String> setComboBox;
 	private final DefaultTableModel tableModel = new DefaultTableModel();
 
 
@@ -86,7 +86,7 @@ public class AppWindow {
 	 * 
 	 */
 	private void setup() {
-		populateComboBox();
+		populateComboBox(0);
 		try {
 			GuiUtils.populateTableFromResultSet(tableModel, CommonSQL.getCards());
 		} catch (SQLException e) {
@@ -155,7 +155,7 @@ public class AppWindow {
 		frame.getContentPane().add(tabbedPane);
 
 		JPanel panel = new JPanel();
-		tabbedPane.addTab("List", null, panel, null);
+		tabbedPane.addTab("Import", null, panel, null);
 		panel.setLayout(new GridLayout(0, 1, 100, 0));
 
 		JPanel panel_1 = new JPanel();
@@ -172,9 +172,11 @@ public class AppWindow {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setToolboxEnabled(false);
 				CardScraper scraper = new CardScraper();
 				String set = setComboBox.getSelectedItem().toString().replaceAll("\\(.*\\)", "");
-				scraper.scrapeCardsFromSets(new String[]{set});
+				scraper.scrapeCardsFromSet(set, true);
+				populateComboBox(setComboBox.getSelectedIndex());
 			}
 		});
 		btnImport.setEnabled(false);
@@ -186,7 +188,7 @@ public class AppWindow {
 		gbc_btnImport.gridy = 0;
 		panel_1.add(btnImport, gbc_btnImport);
 		
-		setComboBox = new JComboBox();
+		setComboBox = new JComboBox<String>();
 		setComboBox.setEnabled(false);
 
 		GridBagConstraints gbc_setComboBox = new GridBagConstraints();
@@ -263,7 +265,7 @@ public class AppWindow {
 		//				}
 
 		JPanel consolePanel = new JPanel();
-		tabbedPane.addTab("Console", null, consolePanel, null);
+		tabbedPane.addTab("Add Set", null, consolePanel, null);
 		consolePanel.setLayout(new BoxLayout(consolePanel, BoxLayout.PAGE_AXIS));
 
 		//		console = new Console();
@@ -292,7 +294,7 @@ public class AppWindow {
 	/**
 	 * @param setComboBox
 	 */
-	private void populateComboBox() {
+	private void populateComboBox(int previous_selection) {
 		//		new SwingWorker<Void, Void>() {
 		//
 		//			@Override
@@ -305,6 +307,7 @@ public class AppWindow {
 				results.add(result);
 			}
 			setComboBox.setModel(new DefaultComboBoxModel(results.toArray()));
+			setComboBox.setSelectedIndex(previous_selection);
 			setToolboxEnabled(true);
 		}catch(Exception e){
 			e.printStackTrace();
