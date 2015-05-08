@@ -173,7 +173,8 @@ public class AppWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				CardScraper scraper = new CardScraper();
-				scraper.scrapeCardsFromSets(new String[]{setComboBox.getSelectedItem().toString()});
+				String set = setComboBox.getSelectedItem().toString().replaceAll("\\(.*\\)", "");
+				scraper.scrapeCardsFromSets(new String[]{set});
 			}
 		});
 		btnImport.setEnabled(false);
@@ -297,10 +298,11 @@ public class AppWindow {
 		//			@Override
 		//			protected Void doInBackground() throws Exception {
 		try{
-			ResultSet sets = CommonSQL.getSets();
+			ResultSet sets = CommonSQL.getSetsWithCardCount();
 			List<String> results = new ArrayList<String>();
 			while(sets.next()) {
-				results.add(sets.getString(2));
+				String result = String.format("%s (%d)", sets.getString(1), sets.getInt(2));
+				results.add(result);
 			}
 			setComboBox.setModel(new DefaultComboBoxModel(results.toArray()));
 			setToolboxEnabled(true);
