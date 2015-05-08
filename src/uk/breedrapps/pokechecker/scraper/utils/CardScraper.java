@@ -28,12 +28,12 @@ import uk.breedrapps.pokechecker.scraper.model.PokemonCard.Builder;
  */
 public class CardScraper {
 
-	public String url = null;
-	public String path = null;
-	public String xpath = null;
+	private String url = null;
+	private String path = null;
+	private String xpath = null;
 
-	final CleanerProperties mCleanerProps; 
-	final HtmlCleaner mCleaner;
+	 private final CleanerProperties mCleanerProps; 
+	 private final HtmlCleaner mCleaner;
 
 	public CardScraper(){
 		Utils.spoofUserAgent();
@@ -41,29 +41,32 @@ public class CardScraper {
 		mCleaner = new HtmlCleaner(mCleanerProps);
 	}
 
-	public void scrapeCardsFromSets(String[] sets){
-		scrapeCardsFromSets(sets, true);
-	}
-
-	public void scrapeCardsFromSets(String[] sets, boolean insert){
-		for(int i = 0; i < sets.length; i++){
-			scrapeCardsFromSet(sets[i], insert);
+	public List<List<PokemonCard>> scrapeCardsFromSets(String[] sets, boolean insert){
+		List<List<PokemonCard>> returnedSets = new ArrayList<>();
+		for(String set : sets){
+			returnedSets.add(scrapeCardsFromSet(set, insert));
 		}
+		return returnedSets;
 	}
 
-	private void scrapeCardsFromSet(String set, boolean insert) {
+	public List<PokemonCard> scrapeCardsFromSet(String set, boolean insert) {
 		try{
 			List<PokemonCard> cards = scrapeCards(set);
 			//Add cards to DB
 			if(insert && cards.size() > 0){
 				CommonSQL.insertCards(cards);
 			}
+			
+			return cards;
+			
 		}catch(Exception e){
+			Log.e(getClass(), "Failed to scrape cards from " + set + ". An error occured");
 			e.printStackTrace();
 		}
+		return null;
 	}
 
-	public List<PokemonCard> scrapeCards(String set){
+	private List<PokemonCard> scrapeCards(String set){
 		url = "http://pkmncards.com/set/";
 		xpath = "//div[@class='entry-content']//div//a";
 		path = Utils.formatSetName(set);
